@@ -1,0 +1,10 @@
+{
+    "name": "me.pereviader.manualdi.main",
+    "version": "1.0.0",
+    "displayName": "ManualDi.Main",
+    "description": "Dependency injection container that provides full control to the user",
+    "unity": "2019.4",
+    "license": "MIT",
+    "dependencies": {
+    }
+}
