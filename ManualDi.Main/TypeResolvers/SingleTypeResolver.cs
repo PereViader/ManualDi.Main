@@ -1,6 +1,4 @@
-﻿using ManualDi.Main.Initialization;
-using ManualDi.Main.Injection;
-using ManualDi.Main.TypeScopes;
+﻿using ManualDi.Main.TypeScopes;
 using System.Collections.Generic;
 
 namespace ManualDi.Main.TypeResolvers
@@ -14,20 +12,17 @@ namespace ManualDi.Main.TypeResolvers
             return typeBinding.TypeScope is SingleTypeScope;
         }
 
-        public object Resolve(IDiContainer container, ITypeBinding typeBinding, IBindingInjector bindingInjector, IBindingInitializer bindingInitializer)
+        public ResolvedInstance Resolve(IDiContainer container, ITypeBinding typeBinding)
         {
             if (Instances.TryGetValue(typeBinding, out var singleInstance))
             {
-                return singleInstance;
+                return ResolvedInstance.Reused(singleInstance);
             }
 
-            var instance = typeBinding.Factory.Create(container);
+            var instance = typeBinding.TypeFactory.Create(container);
             Instances[typeBinding] = instance;
 
-            bindingInjector.Injest(typeBinding, instance);
-            bindingInitializer.Injest(typeBinding, instance);
-
-            return instance;
+            return ResolvedInstance.New(instance);
         }
     }
 }

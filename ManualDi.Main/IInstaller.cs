@@ -1,7 +1,9 @@
 ﻿namespace ManualDi.Main
 {
+    public delegate void InstallDelegate(IDiContainerBindings bindings);
+
     public interface IInstaller
     {
-        void Install(IDiContainer container);
+        void Install(IDiContainerBindings bindings);
     }
 }

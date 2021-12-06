@@ -1,5 +1,4 @@
 ﻿using ManualDi.Main.Initialization;
-using System;
 
 namespace ManualDi.Main
 {
@@ -10,12 +9,7 @@ namespace ManualDi.Main
             InitializationDelegate<TConcrete> initializationDelegate
             )
         {
-            if (typeBinding.BindingInitialization != null)
-            {
-                throw new InvalidOperationException($"Initialize can only be called once on {nameof(ITypeBinding)} of type {typeof(TInterface).FullName}");
-            }
-
-            typeBinding.BindingInitialization = new BindingInitialization<TConcrete>(initializationDelegate);
+            typeBinding.TypeInitialization += new BindingInitialization<TConcrete>(initializationDelegate).Initialize;
             return typeBinding;
         }
     }

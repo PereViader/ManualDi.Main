@@ -1,6 +1,7 @@
 ﻿namespace ManualDi.Main.Initialization
 {
     public delegate void InitializationDelegate<T>(T instance, IDiContainer container);
+    public delegate void UntypedInitializationDelegate(object instance, IDiContainer container);
 
     public class BindingInitialization<T> : IBindingInitialization
     {

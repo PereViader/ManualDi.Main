@@ -5,26 +5,37 @@ namespace ManualDi.Main.Initialization
 {
     public class BindingInitializer : IBindingInitializer
     {
-        private readonly List<Action<IDiContainer>> bindingInitializationCommands = new List<Action<IDiContainer>>();
+        private readonly Stack<List<Action<IDiContainer>>> bindingInitializationCommands = new Stack<List<Action<IDiContainer>>>();
+        private int nestedCount;
 
         public void Injest(ITypeBinding typeBinding, object instance)
         {
-            var bindingInitialization = typeBinding.BindingInitialization;
+            if (nestedCount >= bindingInitializationCommands.Count)
+            {
+                bindingInitializationCommands.Push(new List<Action<IDiContainer>>());
+            }
+
+            var bindingInitialization = typeBinding.TypeInitialization;
             if (bindingInitialization == null)
             {
                 return;
             }
 
-            bindingInitializationCommands.Add((IDiContainer container) => bindingInitialization.Initialize(instance, container));
+            var commands = bindingInitializationCommands.Peek();
+            commands.Add((IDiContainer container) => bindingInitialization.Invoke(instance, container));
         }
 
         public void InitializeAllQueued(IDiContainer container)
         {
-            for (int i = bindingInitializationCommands.Count - 1; i >= 0; i--)
+            nestedCount++;
+
+            var commands = bindingInitializationCommands.Pop();
+            for (int i = 0; i < commands.Count; i++)
             {
-                bindingInitializationCommands[i].Invoke(container);
+                commands[i].Invoke(container);
             }
-            bindingInitializationCommands.Clear();
+
+            nestedCount--;
         }
     }
 }

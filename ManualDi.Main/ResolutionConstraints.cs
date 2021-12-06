@@ -6,7 +6,7 @@ namespace ManualDi.Main
     {
         public Func<ITypeMetadata, bool> TypeMetadata { get; set; }
 
-        public bool Accepts<T>(ITypeBinding<T> typeBinding)
+        public bool Accepts(ITypeBinding typeBinding)
         {
             if (TypeMetadata == null)
             {

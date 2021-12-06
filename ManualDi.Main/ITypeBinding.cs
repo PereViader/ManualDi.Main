@@ -3,7 +3,6 @@ using ManualDi.Main.Injection;
 using ManualDi.Main.TypeFactories;
 using ManualDi.Main.TypeScopes;
 using System;
-using System.Collections.Generic;
 
 namespace ManualDi.Main
 {
@@ -13,9 +12,9 @@ namespace ManualDi.Main
     {
         ITypeMetadata TypeMetadata { get; set; }
         ITypeScope TypeScope { get; set; }
-        ITypeFactory Factory { get; set; }
-        List<ITypeInjection> TypeInjections { get; set; }
-        IBindingInitialization BindingInitialization { get; set; }
+        ITypeFactory TypeFactory { get; set; }
+        UntypedInjectionDelegate TypeInjection { get; set; }
+        UntypedInitializationDelegate TypeInitialization { get; set; }
         bool IsLazy { get; set; }
     }
 

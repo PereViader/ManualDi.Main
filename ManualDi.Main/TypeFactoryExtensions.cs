@@ -13,7 +13,7 @@ namespace ManualDi.Main
             )
             where TConcrete : TInterface
         {
-            typeBinding.Factory = new ContainerAllTypeFactory<TConcrete, TInterface>();
+            typeBinding.TypeFactory = new ContainerAllTypeFactory<TConcrete, TInterface>();
             return typeBinding;
         }
 
@@ -23,7 +23,7 @@ namespace ManualDi.Main
             )
             where TConcrete : TInterface
         {
-            typeBinding.Factory = new ConstraintAllContainerTypeFactory<TConcrete, TInterface>(constraints);
+            typeBinding.TypeFactory = new ConstraintAllContainerTypeFactory<TConcrete, TInterface>(constraints);
             return typeBinding;
         }
 
@@ -32,7 +32,7 @@ namespace ManualDi.Main
             )
             where TConcrete : TInterface
         {
-            typeBinding.Factory = new ContainerTypeFactory<TConcrete, TInterface>();
+            typeBinding.TypeFactory = new ContainerTypeFactory<TConcrete, TInterface>();
             return typeBinding;
         }
 
@@ -42,7 +42,7 @@ namespace ManualDi.Main
             )
             where TConcrete : TInterface
         {
-            typeBinding.Factory = new ConstraintContainerTypeFactory<TConcrete, TInterface>(constraints);
+            typeBinding.TypeFactory = new ConstraintContainerTypeFactory<TConcrete, TInterface>(constraints);
             return typeBinding;
         }
 
@@ -52,7 +52,7 @@ namespace ManualDi.Main
             )
             where TConcrete : TInterface
         {
-            typeBinding.Factory = new InstanceTypeFactory<TInterface>(instance);
+            typeBinding.TypeFactory = new InstanceTypeFactory<TInterface>(instance);
             return typeBinding;
         }
 
@@ -62,7 +62,7 @@ namespace ManualDi.Main
             )
             where TConcrete : TInterface
         {
-            typeBinding.Factory = new MethodTypeFactory<TInterface, TConcrete>(factoryMethodDelegate);
+            typeBinding.TypeFactory = new MethodTypeFactory<TInterface, TConcrete>(factoryMethodDelegate);
             return typeBinding;
         }
 
@@ -71,7 +71,7 @@ namespace ManualDi.Main
             FactoryMethodDelegate<TConcrete> factoryMethodDelegate
             )
         {
-            typeBinding.Factory = new MethodUnsafeTypeFactory<TInterface, TConcrete>(factoryMethodDelegate);
+            typeBinding.TypeFactory = new MethodUnsafeTypeFactory<TInterface, TConcrete>(factoryMethodDelegate);
             return typeBinding;
         }
 
@@ -81,7 +81,7 @@ namespace ManualDi.Main
             where TFactory : IFactory<TConcrete>
             where TConcrete : TInterface
         {
-            typeBinding.Factory = new FactoryTypeFactory<TFactory, TInterface, TConcrete>();
+            typeBinding.TypeFactory = new FactoryTypeFactory<TFactory, TInterface, TConcrete>();
             return typeBinding;
         }
 
