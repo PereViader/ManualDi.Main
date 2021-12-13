@@ -40,25 +40,21 @@ namespace ManualDi.Main
             }
         }
 
-        public T Resolve<T>(IResolutionConstraints resolutionConstraints)
+        public bool TryResolveContainer(Type type, IResolutionConstraints resolutionConstraints, out object resolution)
         {
-            return (T)Resolve(typeof(T), resolutionConstraints);
-        }
-
-        public object Resolve(Type type, IResolutionConstraints resolutionConstraints)
-        {
-            var typeBinding = GetTypeForConstraint(type, resolutionConstraints);
-            if (!typeBinding.IsError)
+            if (TryGetTypeForConstraint(type, resolutionConstraints, out ITypeBinding typeBinding))
             {
-                return ResolveBinding(typeBinding.Value);
+                resolution = ResolveBinding(typeBinding);
+                return true;
             }
 
             if (ParentDiContainer != null)
             {
-                return ParentDiContainer.Resolve(type, resolutionConstraints);
+                return ParentDiContainer.TryResolveContainer(type, resolutionConstraints, out resolution);
             }
 
-            throw new InvalidOperationException($"There was no binding with requested constraints for {type.FullName}");
+            resolution = default;
+            return false;
         }
 
         private object ResolveBinding(ITypeBinding typeBinding)
@@ -90,47 +86,48 @@ namespace ManualDi.Main
             return instance;
         }
 
-        private Result<ITypeBinding> GetTypeForConstraint(Type type, IResolutionConstraints resolutionConstraints)
+        private bool TryGetTypeForConstraint(Type type, IResolutionConstraints resolutionConstraints, out ITypeBinding typeBinding)
         {
             if (!TypeBindings.TryGetValue(type, out var bindings) || bindings.Count == 0)
             {
-                return new Result<ITypeBinding>(new InvalidOperationException($"There are no bindings for type {type.FullName}"));
+                typeBinding = default;
+                return false;
             }
 
             if (resolutionConstraints == null)
             {
-                return new Result<ITypeBinding>(bindings[0]);
+                typeBinding = bindings[0];
+                return true;
             }
 
             foreach (var binding in bindings)
             {
                 if (resolutionConstraints.Accepts(binding))
                 {
-                    return new Result<ITypeBinding>(binding);
+                    typeBinding = binding;
+                    return true;
                 }
             }
 
-            return new Result<ITypeBinding>(new InvalidOperationException("No binding could satisfy constraint"));
+            typeBinding = default;
+            return false;
         }
 
-        private Result<List<ITypeBinding>> GetAllTypeForConstraint(Type type, IResolutionConstraints resolutionConstraints)
+        private bool TryGetAllTypeForConstraint(Type type, IResolutionConstraints resolutionConstraints, out List<ITypeBinding> typeBindings)
         {
             if (!TypeBindings.TryGetValue(type, out var bindings) || bindings.Count == 0)
             {
-                return new Result<List<ITypeBinding>>(new InvalidOperationException($"There are no bindings for type {type.FullName}"));
+                typeBindings = default;
+                return false;
             }
-
-            var typeBindings = new List<ITypeBinding>();
 
             if (resolutionConstraints == null)
             {
-                foreach (var typeBinding in bindings)
-                {
-                    typeBindings.Add(typeBinding);
-                }
-                return new Result<List<ITypeBinding>>(typeBindings);
+                typeBindings = new List<ITypeBinding>(bindings);
+                return true;
             }
 
+            typeBindings = new List<ITypeBinding>();
             foreach (var binding in bindings)
             {
                 if (resolutionConstraints.Accepts(binding))
@@ -139,12 +136,7 @@ namespace ManualDi.Main
                 }
             }
 
-            if (typeBindings.Count == 0)
-            {
-                return new Result<List<ITypeBinding>>(new InvalidOperationException("No binding could satisfy constraint"));
-            }
-
-            return new Result<List<ITypeBinding>>(typeBindings);
+            return typeBindings.Count > 0;
         }
 
         private ITypeResolver GetResolverFor(ITypeBinding typeBinding)
@@ -160,29 +152,20 @@ namespace ManualDi.Main
             throw new InvalidOperationException($"Could not find resolver for type binding of type {typeBinding.GetType().FullName}");
         }
 
-        public void ResolveAll<T>(IResolutionConstraints resolutionConstraints, List<T> resolutions)
+        public void ResolveAllContainer<TResolutionList>(Type type, IResolutionConstraints resolutionConstraints, List<TResolutionList> resolutions)
         {
-            DoResolveAll(typeof(T), resolutionConstraints, resolutions);
-        }
-
-        public void ResolveAll(Type type, IResolutionConstraints resolutionConstraints, List<object> resolutions)
-        {
-            DoResolveAll(type, resolutionConstraints, resolutions);
-        }
-
-        private void DoResolveAll<T>(Type type, IResolutionConstraints resolutionConstraints, List<T> resolutions)
-        {
-            var typeBindings = GetAllTypeForConstraint(type, resolutionConstraints).GetValueOrThrowIfError();
-
-            foreach (var typeBinding in typeBindings)
+            if (TryGetAllTypeForConstraint(type, resolutionConstraints, out var typeBindings))
             {
-                var resolved = ResolveBinding(typeBinding);
-                resolutions.Add((T)resolved);
+                foreach (var typeBinding in typeBindings)
+                {
+                    var resolved = ResolveBinding(typeBinding);
+                    resolutions.Add((TResolutionList)resolved);
+                }
             }
 
             if (ParentDiContainer != null)
             {
-                ParentDiContainer.ResolveAll(resolutionConstraints, resolutions);
+                ParentDiContainer.ResolveAllContainer<TResolutionList>(type, resolutionConstraints, resolutions);
             }
         }
 
