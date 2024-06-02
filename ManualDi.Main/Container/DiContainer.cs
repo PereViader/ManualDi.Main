@@ -44,7 +44,7 @@ namespace ManualDi.Main
             }
         }
 
-        public bool TryResolveContainer(Type type, IResolutionConstraints resolutionConstraints, out object resolution)
+        public bool TryResolveContainer(Type type, IResolutionConstraints? resolutionConstraints, out object resolution)
         {
             if (TryGetTypeForConstraint(type, resolutionConstraints, out ITypeBinding typeBinding))
             {

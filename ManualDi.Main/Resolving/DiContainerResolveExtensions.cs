@@ -6,7 +6,7 @@ namespace ManualDi.Main
     {
         public static T Resolve<T>(this IDiContainer diContainer)
         {
-            return diContainer.Resolve<T>(resolutionConstraints: null);
+            return (T)diContainer.Resolve(typeof(T), resolutionConstraints: null);
         }
 
         public static T Resolve<T>(this IDiContainer diContainer, Action<IResolutionConstraints> resolution)
