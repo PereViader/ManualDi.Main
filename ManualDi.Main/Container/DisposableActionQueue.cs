@@ -5,10 +5,10 @@ namespace ManualDi.Main
 {
     internal sealed class DisposableActionQueue
     {
-        private readonly List<Action> disposeActions = new();
+        private readonly List<IDisposable> disposables = new();
         private bool disposing = false;
 
-        public void QueueDispose(Action disposeAction)
+        public void QueueDispose(IDisposable disposable)
         {
             if (disposing)
             {
@@ -17,21 +17,26 @@ namespace ManualDi.Main
                     );
             }
 
-            disposeActions.Add(disposeAction);
+            disposables.Add(disposable);
+        }
+        
+        public void QueueDispose(Action disposableAction)
+        {
+            QueueDispose(new ActionDisposableWrapper(disposableAction));
         }
 
         public void DisposeAll()
         {
             disposing = true;
 
-            foreach (Action action in disposeActions)
+            foreach (var disposable in disposables)
             {
-                action.Invoke();
+                disposable.Dispose();
             }
 
             disposing = false;
 
-            disposeActions.Clear();
+            disposables.Clear();
         }
     }
 }

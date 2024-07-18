@@ -14,6 +14,7 @@ namespace ManualDi.Main
         public CreateDelegate<TInterface>? CreateInterfaceDelegate { get; set; }
         public InjectionDelegate<TConcrete>? InjectionDelegates { get; set; }
         public InitializationDelegate<TConcrete>? InitializationDelegate { get; set; }
+        public bool ShouldTryToDispose { get; set; } = true; 
         public bool IsLazy { get; set; } = true;
 
         public object Create(IDiContainer container)

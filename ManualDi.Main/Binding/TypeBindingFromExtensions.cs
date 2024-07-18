@@ -57,30 +57,10 @@ namespace ManualDi.Main
         public static TypeBinding<TInterface, TConcrete> FromMethod<TInterface, TConcrete>(
             this TypeBinding<TInterface, TConcrete> typeBinding,
             CreateDelegate<TConcrete> createDelegate
-            )
+        )
             where TConcrete : TInterface
         {
             typeBinding.CreateConcreteDelegate = createDelegate;
-            return typeBinding;
-        }
-
-        public static TypeBinding<TInterface, TConcrete> FromMethodUnsafe<TInterface, TConcrete>(
-            this TypeBinding<TInterface, TConcrete> typeBinding,
-            CreateDelegate<TConcrete> createDelegate
-            )
-        {
-            typeBinding.CreateConcreteDelegate = c =>
-            {
-                TConcrete concreteObj = createDelegate.Invoke(c);
-
-                if (concreteObj is not TInterface)
-                {
-                    throw new InvalidOperationException("MethodUnsafe could not cast provided factory method");
-                }
-
-                return concreteObj;
-            };
-            
             return typeBinding;
         }
 

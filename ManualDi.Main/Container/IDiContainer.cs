@@ -25,9 +25,15 @@ namespace ManualDi.Main
         void ResolveAllContainer<TResolutionList>(Type type, IResolutionConstraints? resolutionConstraints, List<TResolutionList> resolutions);
 
         /// <summary>
+        /// Queues for disposal a disposable. They will be called in order when disposing the container.
+        /// </summary>
+        /// <param name="disposable">The disposable to queue</param>
+        void QueueDispose(IDisposable disposable);
+        
+        /// <summary>
         /// Queues for disposal an action. They will be called in order when disposing the container.
         /// </summary>
-        /// <param name="disposeAction">The action to call when disposing</param>
-        void QueueDispose(Action disposeAction);
+        /// <param name="disposableAction">The disposable action to queue</param>
+        void QueueDispose(Action disposableAction);
     }
 }

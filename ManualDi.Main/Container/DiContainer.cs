@@ -78,6 +78,10 @@ namespace ManualDi.Main
             }
 
             typeBinding.Inject(instance, this);
+            if (typeBinding.ShouldTryToDispose && instance is IDisposable disposable)
+            {
+                QueueDispose(disposable);
+            }
             bindingInitializer.Queue(typeBinding, instance);
 
             isResolving = wasResolving;
@@ -157,9 +161,14 @@ namespace ManualDi.Main
             ParentDiContainer?.ResolveAllContainer<TResolutionList>(type, resolutionConstraints, resolutions);
         }
 
-        public void QueueDispose(Action disposeAction)
+        public void QueueDispose(IDisposable disposable)
         {
-            disposableActionQueue.QueueDispose(disposeAction);
+            disposableActionQueue.QueueDispose(disposable);
+        }
+        
+        public void QueueDispose(Action disposableAction)
+        {
+            disposableActionQueue.QueueDispose(disposableAction);
         }
 
         public void Dispose()

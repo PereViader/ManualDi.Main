@@ -9,14 +9,17 @@ namespace ManualDi.Main
         public static TypeBinding<TInterface, TConcrete> Dispose<TInterface, TConcrete>(
             this TypeBinding<TInterface, TConcrete> typeBinding
             )
-            where TConcrete : IDisposable
         {
-            return Dispose(typeBinding, GetDispose);
+            typeBinding.ShouldTryToDispose = true;
+            return typeBinding;
         }
 
-        private static Action GetDispose<T>(T instance, IDiContainer container) where T : IDisposable
+        public static TypeBinding<TInterface, TConcrete> DontDispose<TInterface, TConcrete>(
+            this TypeBinding<TInterface, TConcrete> typeBinding
+        )
         {
-            return instance.Dispose;
+            typeBinding.ShouldTryToDispose = false;
+            return typeBinding;
         }
 
         public static TypeBinding<TInterface, TConcrete> Dispose<TInterface, TConcrete>(
@@ -24,6 +27,7 @@ namespace ManualDi.Main
             GetDisposeDelegate<TConcrete> getDisposeDelegate
             )
         {
+            typeBinding.ShouldTryToDispose = false;
             typeBinding.Inject((o, c) => c.QueueDispose(getDisposeDelegate.Invoke(o, c)));
             return typeBinding;
         }
